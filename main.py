@@ -31,17 +31,42 @@ Example:
 >>> longest_path(graph)
 7
 """
+from collections import deque
 
 def longest_path(graph: list) -> int:
-    # Your implementation goes here
-    pass
+    topo_order = topological_sort(graph)
+    return calculate_longest_path(graph, topo_order)
 
-# Helper function to perform topological sort
 def topological_sort(graph):
-    # Your implementation goes here
-    pass
+    n = len(graph)
+    in_degree = [0] * n
+    for u in range(n):
+        for v, w in graph[u]:
+            in_degree[v] += 1
 
-# Function to calculate longest path using topological sort
+    queue = deque([i for i in range(n) if in_degree[i] == 0])
+    topo_order = []
+
+    while queue:
+        node = queue.popleft()
+        topo_order.append(node)
+        for v, w in graph[node]:
+            in_degree[v] -= 1
+            if in_degree[v] == 0:
+                queue.append(v)
+
+    return topo_order
+
 def calculate_longest_path(graph, topo_order):
-    # Your implementation goes here
-    pass
+    n = len(graph)
+    dist = [-float('inf')] * n
+
+    for node in topo_order:
+        if dist[node] == -float('inf'):
+            dist[node] = 0
+
+        for v, w in graph[node]:
+            if dist[v] < dist[node] + w:
+                dist[v] = dist[node] + w
+
+    return max(dist)
